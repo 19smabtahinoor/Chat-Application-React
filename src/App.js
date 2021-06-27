@@ -2,6 +2,8 @@ import React, { useState,useEffect } from 'react';
 import Messege from './components/Messege';
 import db from './firebase/firebase';
 import {Button} from '@material-ui/core'
+import firebase from 'firebase';
+import FlipMove from 'react-flip-move';
 
 function App() {
   const [input, setInput] = useState("")
@@ -10,7 +12,9 @@ function App() {
   const time = new Date().toLocaleTimeString()
 
   useEffect( () => {
-    db.collection('messeges').onSnapshot( snapshot => {
+    db.collection('messeges')
+    .orderBy('timestamp','desc')
+    .onSnapshot( snapshot => {
       setMessege(snapshot.docs.map( doc => doc.data()))
     })
   },[])
@@ -23,11 +27,13 @@ function App() {
 
     db.collection('messeges').add( {
       messege:input,
-      username:userName
+      username:userName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     })
     setMessege([...messeges, {username:userName,messege:input,messegeTime:time}])
     setInput("")
   }
+
 
   return (
     <div className="max-w-screen-lg mx-auto">
@@ -42,15 +48,15 @@ function App() {
         <Button disabled={!input} className="bg-blue-500 rounded-lg shadow-lg p-5" type="button" onClick={() => sendMessege()}>Send Messege</Button>
 
       {/* Display Messeges */}
-      <div>
+      <FlipMove>
         {
           messeges.map((messege,index) => (
             // <Messege key={index} text={messege.text} username={messege.username} time={messege.messegeTime}/>
 
-            <Messege username={userName} messege={messege}/>
+            <Messege key={index} username={userName} messege={messege}/>
           ))
         }
-      </div>
+      </FlipMove>
     </div>
   );
 }

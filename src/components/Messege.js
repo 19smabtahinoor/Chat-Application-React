@@ -1,15 +1,18 @@
 import React,{forwardRef} from 'react'
 import styled from 'styled-components'
+import { useAuth0 } from "@auth0/auth0-react";
 
 
 
 const Messege = forwardRef(({ key ,messege, username },ref) => {
     const isUser = username === messege.username
+    const { user } = useAuth0();
 
     return (
         <MessegeWrapper>
+
             <div ref={ref} className={`messege_guest ${isUser && 'messege_user'}`}>
-                <h3 className={isUser ? 'messege_user' : 'messege_guest'}>{messege.username} : {messege.messege}</h3>
+                <h3 className={isUser ? 'messege_user' : 'messege_guest'}>{user.name} : {messege.messege}</h3>
             </div>
         </MessegeWrapper>
     ) 
